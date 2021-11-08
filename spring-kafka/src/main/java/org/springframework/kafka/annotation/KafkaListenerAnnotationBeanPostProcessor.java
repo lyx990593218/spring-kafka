@@ -624,6 +624,18 @@ public class KafkaListenerAnnotationBeanPostProcessor<K, V>
 		}
 	}
 
+	private void processKafkaListenerEndpointAfterRegistration(MethodKafkaListenerEndpoint<?, ?> endpoint, KafkaListener kafkaListener) {
+		endpoint.setBeanFactory(this.beanFactory);
+		String errorHandlerBeanName = resolveExpressionAsString(kafkaListener.errorHandler(), "errorHandler");
+		if (StringUtils.hasText(errorHandlerBeanName)) {
+			resolveErrorHandler(endpoint, kafkaListener);
+		}
+		String converterBeanName = resolveExpressionAsString(kafkaListener.contentTypeConverter(), "contentTypeConverter");
+		if (StringUtils.hasText(converterBeanName)) {
+			resolveContentTypeConverter(endpoint, kafkaListener);
+		}
+	}
+
 	private void resolveErrorHandler(MethodKafkaListenerEndpoint<?, ?> endpoint, KafkaListener kafkaListener) {
 		Object errorHandler = resolveExpression(kafkaListener.errorHandler());
 		if (errorHandler instanceof KafkaListenerErrorHandler) {
